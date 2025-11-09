@@ -2,7 +2,7 @@
 
 #Step 1: Set working directory and load data
 
-Engrualicypris_Morphology <- read.table("Engraulicypris_Morphology.txt",header=TRUE,fill=TRUE,sep="\t",check.names=FALSE)
+Engraulicypris_Morphology <- read.table("Engraulicypris_Morphology.txt",header=TRUE,fill=TRUE,sep="\t",check.names=FALSE)
 
 #Load packages
 library(VIM)
@@ -13,39 +13,39 @@ library(ggpubr)
 
 #Step 2: Impute missing data and derive residuals for 8 morphological variables, selecting size standardisation variables that maximise body shape variation
 
-Engrualicypris_Morphology2 <- kNN(Engrualicypris_Morphology[,c(3:11)], k = 5)
-Engrualicypris_Morphology2 <- cbind(Engrualicypris_Morphology[,c(1:2)], Engrualicypris_Morphology2[,c(1:9)])
+Engraulicypris_Morphology2 <- kNN(Engraulicypris_Morphology[,c(3:11)], k = 5)
+Engraulicypris_Morphology2 <- cbind(Engraulicypris_Morphology[,c(1:2)], Engraulicypris_Morphology2[,c(1:9)])
 
-HL_SR <- lm(log10(HL) ~ log10(BD), data = Engrualicypris_Morphology2)
-ED_SR <- lm(log10(ED) ~ log10(BD), data = Engrualicypris_Morphology2)
-BD_SR <- lm(log10(BD) ~ log10(SL), data = Engrualicypris_Morphology2)
-CPL_SR <- lm(log10(CPL) ~ log10(BD), data = Engrualicypris_Morphology2)
-CPD_SR <- lm(log10(CPD) ~ log10(BD), data = Engrualicypris_Morphology2)
-PDL_SR <- lm(log10(PDL) ~ log10(BD), data = Engrualicypris_Morphology2)
-PVL_SR <- lm(log10(PVL) ~ log10(BD), data = Engrualicypris_Morphology2)
-SNL_SR <- lm(log10(SNL) ~ log10(BD), data = Engrualicypris_Morphology2)
+HL_SR <- lm(log10(HL) ~ log10(BD), data = Engraulicypris_Morphology2)
+ED_SR <- lm(log10(ED) ~ log10(BD), data = Engraulicypris_Morphology2)
+BD_SR <- lm(log10(BD) ~ log10(SL), data = Engraulicypris_Morphology2)
+CPL_SR <- lm(log10(CPL) ~ log10(BD), data = Engraulicypris_Morphology2)
+CPD_SR <- lm(log10(CPD) ~ log10(BD), data = Engraulicypris_Morphology2)
+PDL_SR <- lm(log10(PDL) ~ log10(BD), data = Engraulicypris_Morphology2)
+PVL_SR <- lm(log10(PVL) ~ log10(BD), data = Engraulicypris_Morphology2)
+SNL_SR <- lm(log10(SNL) ~ log10(BD), data = Engraulicypris_Morphology2)
 
 Example_residuals <- data.frame(HL_SR$residuals, ED_SR$residuals, 
                                 BD_SR$residuals, CPL_SR$residuals,
                                 CPD_SR$residuals, PDL_SR$residuals,
                                 PVL_SR$residuals, SNL_SR$residuals)
 
-Engrualicypris_Morphology <- cbind(Engrualicypris_Morphology$Code, Engrualicypris_Morphology$Group, Example_residuals)
-colnames(Engrualicypris_Morphology)[1] <- "Code"
-colnames(Engrualicypris_Morphology)[2] <- "Group"
+Engraulicypris_Morphology <- cbind(Engraulicypris_Morphology$Code, Engraulicypris_Morphology$Group, Example_residuals)
+colnames(Engraulicypris_Morphology)[1] <- "Code"
+colnames(Engraulicypris_Morphology)[2] <- "Group"
 
 #clean house
-rm(Engrualicypris_Morphology2, Example_residuals, HL_SR, ED_SR, BD_SR, CPL_SR, CPD_SR, PDL_SR, PVL_SR, SNL_SR)
+rm(Engraulicypris_Morphology2, Example_residuals, HL_SR, ED_SR, BD_SR, CPL_SR, CPD_SR, PDL_SR, PVL_SR, SNL_SR)
 
 #Step 3: Linear Discriminant Analysis
 
 LDA  <-  lda(Group ~ HL_SR.residuals + ED_SR.residuals + 
                BD_SR.residuals + CPL_SR.residuals + CPD_SR.residuals + 
-               PDL_SR.residuals + PVL_SR.residuals + SNL_SR.residuals, data = Engrualicypris_Morphology)
+               PDL_SR.residuals + PVL_SR.residuals + SNL_SR.residuals, data = Engraulicypris_Morphology)
 LDA_predict <- predict(LDA)
 LDA_score <- as.data.frame(LDA_predict)
-Engrualicypris_Morphology$LD1 <- LDA_score$x.LD1
-Engrualicypris_Morphology$LD2 <- LDA_score$x.LD2
+Engraulicypris_Morphology$LD1 <- LDA_score$x.LD1
+Engraulicypris_Morphology$LD2 <- LDA_score$x.LD2
 
 #For the loadings of the variables on the axes
 LDA$scaling
@@ -59,21 +59,22 @@ LDA$svd
 rm(LDA_predict, LDA)
 
 # Calculate convex hulls for each group 
-LDA_find_hull <- function(LDA_score) LDA_score[chull(Engrualicypris_Morphology$LD1, Engrualicypris_Morphology$LD2), ] 
+LDA_find_hull <- function(LDA_score) LDA_score[chull(Engraulicypris_Morphology$LD1, Engraulicypris_Morphology$LD2), ] 
 LDA_hulls <- LDA_score %>% group_by(class) %>% do(LDA_find_hull(.))
+rm(LDA_score)
 
 #Step 4: A plot
 
-Engrualicypris_Morphology <- Engrualicypris_Morphology %>%
+Engraulicypris_Morphology <- Engraulicypris_Morphology %>%
   mutate(Group = factor(Group,
                         levels = c("E.sardella_LakeMalawi", "E.spinifer_LakeMalawi", "E.spinifer_Malagarasi"),  # current values
                         labels = c("Engraulicypris sardella",
                                    "Engraulicypris spinifer (Lake Malawi Catchment)",
                                    "Engraulicypris spinifer (Malagarasi Catchment)")))
-Engrualicypris_Morphology <- Engrualicypris_Morphology %>% rename(Species = Group)
+Engraulicypris_Morphology <- Engraulicypris_Morphology %>% rename(Species = Group)
 
 Plot_LDA <- ggscatter(
-  Engrualicypris_Morphology,
+  Engraulicypris_Morphology,
   x = "LD1",
   y = "LD2",
   color = "Species",
@@ -93,6 +94,8 @@ theme(legend.position = "right")
 
 Plot_LDA
 
+#Export as 8 x 4.5 inches
+
 #Step 5: Testing for differences
 
 #Global tests with all three groups
@@ -100,34 +103,34 @@ Plot_LDA
 ManovaTest_Global <- manova(cbind(HL_SR.residuals, ED_SR.residuals, 
                            BD_SR.residuals, CPL_SR.residuals,
                            CPD_SR.residuals, PDL_SR.residuals,
-                           PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology)
+                           PVL_SR.residuals, SNL_SR.residuals) ~ Species, data = Engraulicypris_Morphology)
 summary(ManovaTest_Global)
 
 #Pairwise tests, comparing E. spinifer Lake Malawi vs. E. spinifer Malagarasi
 
-Engrualicypris_Morphology_Pair1 <- Engrualicypris_Morphology %>% filter(Group != "E.sardella_LakeMalawi")
+Engraulicypris_Morphology_Pair1 <- Engraulicypris_Morphology %>% filter(Species != "E.sardella_LakeMalawi")
 ManovaTest_Pair1 <- manova(cbind(HL_SR.residuals, ED_SR.residuals, 
                                   BD_SR.residuals, CPL_SR.residuals,
                                   CPD_SR.residuals, PDL_SR.residuals,
-                                  PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology_Pair1)
+                                  PVL_SR.residuals, SNL_SR.residuals) ~ Species, data = Engraulicypris_Morphology_Pair1)
 summary(ManovaTest_Pair1)
 
 #Pairwise tests, comparing E. spinifer Lake Malawi vs. E. sardella
 
-Engrualicypris_Morphology_Pair2 <- Engrualicypris_Morphology %>% filter(Group != "E.spinifer_LakeMalawi")
+Engraulicypris_Morphology_Pair2 <- Engraulicypris_Morphology %>% filter(Species != "E.spinifer_LakeMalawi")
 ManovaTest_Pair2 <- manova(cbind(HL_SR.residuals, ED_SR.residuals, 
                                  BD_SR.residuals, CPL_SR.residuals,
                                  CPD_SR.residuals, PDL_SR.residuals,
-                                 PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology_Pair2)
+                                 PVL_SR.residuals, SNL_SR.residuals) ~ Species, data = Engraulicypris_Morphology_Pair2)
 summary(ManovaTest_Pair2)
 
 #Pairwise tests, comparing E. spinifer Malagarasi vs. E. sardella
 
-Engrualicypris_Morphology_Pair3 <- Engrualicypris_Morphology %>% filter(Group != "E.spinifer_Malagarasi")
+Engraulicypris_Morphology_Pair3 <- Engraulicypris_Morphology %>% filter(Species != "E.spinifer_Malagarasi")
 ManovaTest_Pair3 <- manova(cbind(HL_SR.residuals, ED_SR.residuals, 
                                  BD_SR.residuals, CPL_SR.residuals,
                                  CPD_SR.residuals, PDL_SR.residuals,
-                                 PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology_Pair3)
+                                 PVL_SR.residuals, SNL_SR.residuals) ~ Species, data = Engraulicypris_Morphology_Pair3)
 summary(ManovaTest_Pair3)
 
 #end of code
