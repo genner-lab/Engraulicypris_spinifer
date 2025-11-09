@@ -1,5 +1,3 @@
-# Badge Here
-
 # Engraulicypris spinifer
 
 Population genetics and morphology of Engraulicypris from Tanzania and Malawi
