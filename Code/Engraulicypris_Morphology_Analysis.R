@@ -2,8 +2,7 @@
 
 #Step 1: Set working directory and load data
 
-setwd("~/Desktop/Live_Manuscripts/_Completed_Manuscripts/Engrualicypris - Mesobola")
-Engrualicypris_Morphology <- read.table("Engrualicypris_Morphology.txt",header=TRUE,fill=TRUE,sep="\t",check.names=FALSE)
+Engrualicypris_Morphology <- read.table("Engraulicypris_Morphology.txt",header=TRUE,fill=TRUE,sep="\t",check.names=FALSE)
 
 #Load packages
 library(VIM)
@@ -57,11 +56,10 @@ LDA$svd
 #so convert to percentages (3.19924/28.19506*100 = 11.35%)
 
 #clean house
-rm(LDA_predict, LDA_score, LDA)
-
+rm(LDA_predict, LDA)
 
 # Calculate convex hulls for each group 
-LDA_find_hull <- function(LDA_score) LDA_score[chull(Engrualicypris_Morphology2$LD1, Engrualicypris_Morphology2$LD2), ] 
+LDA_find_hull <- function(LDA_score) LDA_score[chull(Engrualicypris_Morphology$LD1, Engrualicypris_Morphology$LD2), ] 
 LDA_hulls <- LDA_score %>% group_by(class) %>% do(LDA_find_hull(.))
 
 #Step 4: A plot
@@ -114,4 +112,4 @@ ManovaTest_Pair3 <- manova(cbind(HL_SR.residuals, ED_SR.residuals,
                                  PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology_Pair3)
 summary(ManovaTest_Pair3)
 
-#end of code
+#End of Code
