@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1092807609.svg)](https://doi.org/10.5281/zenodo.17566228)
+
 # Engraulicypris spinifer
 
 Population genetics and morphology of Engraulicypris from Tanzania and Malawi
