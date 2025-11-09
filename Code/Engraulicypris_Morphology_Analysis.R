@@ -64,14 +64,32 @@ LDA_hulls <- LDA_score %>% group_by(class) %>% do(LDA_find_hull(.))
 
 #Step 4: A plot
 
-Plot_LDA <- ggscatter(Engrualicypris_Morphology, x = "LD1", y = "LD2",
-                      color = "Group", shape = "Group",
-                      palette = c("cyan", "blue2", "darkgoldenrod1"),
-                      ellipse = TRUE, ellipse.type = "convex",
-                      mean.point = FALSE, star.plot = FALSE) +
+Engrualicypris_Morphology <- Engrualicypris_Morphology %>%
+  mutate(Group = factor(Group,
+                        levels = c("E.sardella_LakeMalawi", "E.spinifer_LakeMalawi", "E.spinifer_Malagarasi"),  # current values
+                        labels = c("Engraulicypris sardella",
+                                   "Engraulicypris spinifer (Lake Malawi Catchment)",
+                                   "Engraulicypris spinifer (Malagarasi Catchment)")))
+Engrualicypris_Morphology <- Engrualicypris_Morphology %>% rename(Species = Group)
+
+Plot_LDA <- ggscatter(
+  Engrualicypris_Morphology,
+  x = "LD1",
+  y = "LD2",
+  color = "Species",
+  shape = "Species",
+  palette = c("#FFD700", "#9CCBF0", "#006285"),
+  ellipse = TRUE,
+  ellipse.type = "convex",
+  mean.point = FALSE,
+  star.plot = FALSE
+) +
   theme_classic() +
-  labs(x = "LD1 (88.65% of variation)", y = "LD2 (11.35% of variation)") +
-  theme(legend.position = "right")
+  labs(
+    x = "LD1 (88.65% of variation)",
+    y = "LD2 (11.35% of variation)"
+  )
+theme(legend.position = "right")
 
 Plot_LDA
 
@@ -112,4 +130,4 @@ ManovaTest_Pair3 <- manova(cbind(HL_SR.residuals, ED_SR.residuals,
                                  PVL_SR.residuals, SNL_SR.residuals) ~ Group, data = Engrualicypris_Morphology_Pair3)
 summary(ManovaTest_Pair3)
 
-#End of Code
+#end of code
